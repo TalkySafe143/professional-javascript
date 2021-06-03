@@ -1,0 +1,12 @@
+{
+  "name": "professionaljavascript",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Sebastian Galindo <sebastian.galindo143@gmail.com>",
+  "license": "MIT"
+}
