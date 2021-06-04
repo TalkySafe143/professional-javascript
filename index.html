@@ -24,9 +24,10 @@
             <source src="./assets/Naturaleza.mp4">
         </video>
 
-        <button>Play/Pause</button>
-
+        <button class="play">Play/Pause</button>
+        <button class="mute">Mute/Unmute</button>
     </main>
-    <script src="/assets/index.js"></script>
+    <!-- Aqui estamos importando este script como modulo porque utiliza otro modulo en su ejecucion, y este tiene el module scope, por lo tanto tenemos que definir este script como modulo. -->
+    <script type="module" src="/assets/index.js"></script>
 </body>
 </html>
