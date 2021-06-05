@@ -1,5 +1,5 @@
 //---------------------------------------------------------------- APUNTES -------------------------------------------------------------------------------------
-
+// https://augdiaugus.gitbook.io/recoleccion-de-notas-publicas/escuela-de-javascript/curso-profesional-de-javascript#interfaces
 // En este espacio se van a tomar apuntes de todo lo que se explique, algunas cosas estan en el nivel master de mi otra carpeta de JavaScript, sin embargo aqui se van a documentar, hay que tener en cuenta que no se van a documentar cosas obvias como los queryselectors o cosas asi.
 
 //------------ Pequeña anotacion de buenas practicas -----------------
@@ -60,3 +60,93 @@ const colorPrinter = makeColorPrinter('Azul'); // Esto es un closure, ya que nos
 colorPrinter(); // Your color is: Azul
 
 // Y el ejemplo de las variables privadas estan en la carpeta de Scope_Clousures.
+
+//-------------------- Call, apply y blind -------------------------
+
+// Estos tres metodos pertenecen al prototipo de Function y sirve para poder establecer el valor de this.
+//--------------------- call() --------------------------------------
+
+// Cuando nosotros no establecemos una funcion como un prototipo pero queremos usar THIS, call() nos va a ayudar a establecer el this para esa funcion. EJEMPLO:
+
+function saludar() {
+    console.log(`Hola mi pana, mi nombre es ${this.nombre} ${this.apellido}`); // Aqui estamos definiendo una funcion que utliza el this, un this que en este caso cogería a Window, porque es el objeto que lo ejecuta
+}
+
+saludar.call({ // El metodo CALL(), permite pasarle el objeto al cual se va a referir this. Como vemos estamos asignando el this de la funcion con un objeto, que este tiene la propiedades que estamos necesitando en la funcion
+    nombre: "Sebastian", // Si nosotros no definimos el objeto para la funcion con el metodo call(), no se llama la funcion y el this se referirá a Window
+    apellido: "Galindo"
+}) // Este metodo ejecuta la funcion de una vez
+
+// Cuando una funcion recibe parametros, con el metodo call() tenemos que tambien incluir esos parametros aparte del contexto del this. EJEMPLO:
+
+function caminar(metros, direccion) {
+    console.log(`${this.name} caminó ${metros} metros hacia ${direccion}.`); // En este caso tambien estamos llamando a los parametros
+}
+
+caminar.call({
+    name: "Sebastian"
+}, 400, 'Belen') // A parte del objeto le estamos pasando los argumentos que necesita la funcion para poder ejecutarse. call() ejecuta la funcion con el this y los argumentos que le indiquemos
+
+//---------------------- apply() ------------------------
+
+// El metodo apply() es muy parecido, casi que cumple la misma funcionalidad que el call, solo que los argumentos de la funcion se pasan como un array.
+
+caminar.apply({nombre: "Sebastian"}, [400, 'Belen']) // Esta sintaxis de apply() va a tener el mismo efecto que call(), es casi lo mismo!
+
+//------------------- bind() ----------------------------
+
+// El metodo bind() lo que hace es crear una nueva funcion en base a la funcion que le especifiquemos pero aplicando el this que le pasemos como argumento. Este metodo NO ejecuta la funcion.
+
+const daniel = { nombre: "Daniel" }; // Estamos definiendo el objeto del this que le vamos a pasar como argumento a bind();
+
+const danielCamina = caminar.bind(daniel, 400, 'Belen'); // En este caso, estamos creando la funcion danielCamina() con el this y los argumentos que le pasamos al metodo bind() en base a la funcion caminar(), es como instanciar esa funcio para que se maneje con un this diferente
+danielCamina(); // Aqui estamos ejecutando dicha funcion caminar pero con sus argumentos y sus this ya aplicados
+
+// El function currying es cuando aplicamos el bind() con la mitad o cierto tipo de argumentos y luego en la misma funcion llenamos los otros argumentos, esto permite hacer funciones reutilizables
+
+//--------------- Utilidad -----------------------------
+// Vamos a ver un ejemplo de utilidad de los metodos call, apply o bind
+const buttons = document.getElementsByClassName('mamawbo'); // Aqui estamos pidiendo que nos recolecte todos los elementos, esto nos devuelve un NodeList
+console.log(buttons); // Este NodeList pareciera que fuera un array, pero no lo es, no tiene todos los metodos de los arrays
+Array.prototype.forEach.call(buttons, buttonn => buttonn.onclick = () => alert('Nunca pares de aprender')) // Por eso estos metodos toman importancia, porque podemos acceder al prototipo de forEach, que es la funcion que queremos ejecutar pero no podemos y le podemos aplicar el this del NodeList, ya que este tiene una propiedad length y eso le basta a forEach para poder iterar con los elementos de la array, o en este caso del NodeList
+
+
+//---------------- Pequeña anotacion de los prototipos --------
+
+const newObjeto = Object.create(objeto) // Tenemos el metodo Object.create() que recibe como parametro un objeto, este metodo va a crear un nuevo objeto pero va a asignar el objeto que le pasemos como parametro como prototipo, es decir, el objeto newObjeto va a tener y va a heredar todos los metodos y propeidades que tiene el objeto 'objeto'. Object.create() principalmente asigna un prototipo a un objeto que vayamos a crear.
+
+// NOTA: Cuando nosotros creamos una instancia de un objeto, tenemos que referirnos a el prototipo con (__proto__) pero si estamos modificando el prototipo directamente desde el objeto principal, tenemos que refirnos a el con (prototype)
+// NOTA: Object.getPrototypeOf() es la forma recomendada de obtener el prototipo de una instancia, porque __proto__ esta definido por el browser y no es tan efectivo
+
+// Cuando nosotros utilizamos la palabra reservada new, estamos ahorrando muchos aspectos que si usariamos el Object.create().
+// - Hace un Object.create() y coge el prototipo del objeto que se especifique despues del 'new'
+// - Inicializa el this. Cuando miramos la sintaxis de una funcion con new es que inicializa el this. Por eso podemos acceder y estableces propiedades de metodo de this. Es como si hiciera lo siguiente! this = Object.create(Funcion.prototype). y al final de la funcion retorna this. Cuando nosotros instanciamos el objeto con new, lo que estamos viendo en realidad es el retorno de this. Este segundo punto lo hace implicitamente!
+
+// Cada instancia de un objeto tiene algunas propiedades para verificar la herencia prototipal que tiene JavaScript
+// Vamos a hacer un objeto desde la funcion para ver esto.
+
+function Hero(name){
+    this.name = name;
+}
+
+Hero.prototype.saludar = function(){console.log(`Hola, yo soy ${this.name}`)};
+
+const zelda = new Hero('Zelda');
+
+zelda.hasOwnProperty('name') // este metodo, hasOwnProperty() es un metodo que nos permite verificar si la propiedad o el metodo que le pasemos en el parametro, a que pertenece?? A una herencia o a ese objeto mismo? Si tiene esa propiedad desde el mismo objeto sin ninguna herencia, va a retornar 'true'. Si hace parte de una herencia prototipal, va a retornar 'false'
+
+//------------- Pequeña anotacion del engine de JavaScript -------------------
+
+// Como ya sabemos, el engine o nuestro archivo fuente hace el siguiente recorrido hasta llegar al navegador.
+// File -> Parser -> AST -> Interpreter -> Profiler (Monitor) -> Compiler -> Optimized code -> Bitecode/Machine Code
+// El parser mira todos los token o palabras reservadas que tiene el archivo para generar el AST, sin embargo si algo no concuerda se produce el Syntax Error!!
+// El Syntax Error es originario del parser, hay dos tipos de parsing que puede realizar el parser:
+// Eager parsing: Encuentra los errores en la sintaxis, crea el AST y construye los scopes
+// Lazy parsing: Doble de rapido que el Eager parsing, no crea el AST y construye los scopes parcialmente
+// Una pagina en el cual podemos ver los TOKENS y los arboles (AST) que nos hace el Parser es: https://esprima.org/demo/parse.html# Aqui podemos ver todo!
+
+// Bytecode vs Machine code!
+// Bytecode: Es parecido al lenguaje assembly, este es portatil y es ejecutado por una maquina virtual
+// Machine code: Codigo binario y tiene instrucciones especificas a una arquitectura o procesador.
+
+// Callstack: Este se le agrega las tareas o las funciones por medio de procedimientos que se llama 'push' y para eliminar funciones del stack porque y fueron ejecutadas se llama 'pop', las promesas van es una cola que se les llama microtareas (Microtasks Queue), y esta tiene preferencia frente a task queue, osea, el event loop siempre va a hacer las microtareas y luego va a hacer las tareas que estan en cola.
