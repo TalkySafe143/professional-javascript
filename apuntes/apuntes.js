@@ -197,3 +197,19 @@ const handler = { // Aqui vamos a definir el objeto con su respectivo getter par
 const p = new Proxy(target, handler) // Primero que todo hay que instanciar el objeto Proxy, este va a recibir dos parametros, el objeto que se va a interceptar y el handler, o lo que vamos a hacer cuando intercepte algo, este handler es un objeto con un getter o setter, como se te antoje!
 // En este caso 'p' quedaría con el mismo valor que el objeto 'target'
 // Lee muy atentamente la explicacion a este ejercicio y lee las documentaciones
+
+//----------------------- Abortar peticiones Fetch ------------------------------
+// Antes, cuando fetch hasta ahora se había implementado, no había forma de que se pudiera parar o abortar como tal la petición, hasta que llego... AbortController()
+// Veamos el siguiente ejemplo con fetch.
+const url = 'https://www.espai.es/blog/wp-content/uploads/2019/06/fetch.jpg' // En este caso vamos a pedir una imagen
+let controller; // Aqui vamos a declarar la variable sin inicializarla para poder utilizar el abortController() en todas las partes del programa
+async function loadImage() {
+    // Todo esto imaginemoslo como si el usario tuviera una conexion nefasta
+    controller = new AbortController(); // Aqui estamos instanciando el abort controller, este nos va a proporcionar un metodo y una propiedad, la señal y el metodo de abortar, primero tenemos que asignarle al fetch la propiedad de señal!
+    const response = await fetch(url, { // Estamos pidiendo un fetch hacia la imagen
+        signal: controller.signal // En el objeto de opciones del fetch va a recibir una señal, esta va a ser la señal del controlador del abortController()
+    }); 
+    const blobImage = await response.blob(); // Como es un binario lo tenemos que volver blob. MAS EXPLICADO EN MI OTRA CARPETA DE JAVASCRIPT
+    const sourceImage = URL.createObjectURL(blobImage); // Y con la interfaz URL.createObjectURL() nos va a pasar la url del objeto/blob que le ingresemos en el parametro.
+    controller.abort() // Si nosotros queremos abortar la peticion fetch, tenemos que llamar al metodo abort() del abortController().
+}

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fetch abort</title>
+</head>
+<body>
+    <div class="container">
+        <video class="imagen"></video>
+    </div>
+    <button>Cargar imagen</button>
+    <button>Abortar la carga</button>
+    <script>
+        const [load, abort] = document.querySelectorAll('button');
+        const imagen = document.querySelector('.imagen');
+        
+        let controller;
+
+        async function loadImage() {
+            if (imagen.src) {
+                console.log('Ya esta cargado capo!')
+                return;
+            }
+
+            controller = new AbortController();
+            const url = '../assets/Naturaleza.mp4';
+            const response = await fetch(url, {
+                signal: controller.signal
+            });
+            const blobImage = await response.blob();
+            const sourceUrl = URL.createObjectURL(blobImage);
+
+            imagen.src = sourceUrl;
+            abort.disabled = true;
+        }
+
+        load.onclick = () => loadImage();
+        abort.onclick = () => {
+            controller.abort();
+            abort.disabled = true;
+        }
+    </script>
+</body>
+</html>
