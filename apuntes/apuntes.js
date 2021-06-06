@@ -150,3 +150,50 @@ zelda.hasOwnProperty('name') // este metodo, hasOwnProperty() es un metodo que n
 // Machine code: Codigo binario y tiene instrucciones especificas a una arquitectura o procesador.
 
 // Callstack: Este se le agrega las tareas o las funciones por medio de procedimientos que se llama 'push' y para eliminar funciones del stack porque y fueron ejecutadas se llama 'pop', las promesas van es una cola que se les llama microtareas (Microtasks Queue), y esta tiene preferencia frente a task queue, osea, el event loop siempre va a hacer las microtareas y luego va a hacer las tareas que estan en cola.
+
+//----------------- Pequeña anotacion de los getter y los setter -----------------
+// Cuando nosotros tenemos un objeto y queremos hacer una propiedad virtual podemos hacer algun metodo getter o setter
+const objeto = { // Nosotros tenemos un objeto
+    nombre: 'Sebastian',
+    get name() { // Con el keyword get seguido del nombre de la propiedad que deseemos, se va a hacer automaticamente el getter 
+        return this.nombre; // A este metodo getter le vamos a retornar el valor que nosotros le digamos o el correspondiente al nombre del getter
+    },
+    set name(value){ // Con el keyword set seguido del mismo nombre del getter, este va a tomar el rol de setter, la mayoría de los casos se le asigna parametros
+        this.nombre = value; // Aqui lo unico que hacemos es reasignar el valor.
+    }
+}
+// Los getter y los setter son utiles para cuando nosotros tenemos que pasar objetos mediante archivos para los plugins o algo así, no queremos que tenga el accesos a las variables directamente del objeto o de la clase, podemos hacer un objeto y dentro crear referencias para las propiedades principales, los getter sirven para dar una referencia a esa propiedad y los setter para poder modificarla desde fuera.
+
+objeto.name // En este momento se esta llamando al getter del objeto y va a retornar la referencia que le indicamos
+
+objeto.name = 'Pepito' // Cuando nosotros queremos reasignar la variable es cuando se llama al setter para modificarlo.
+
+// NOTA: Si el setter no existiera en el objeto, reasignarlo no sería posible! ya que el getter es readonly.
+
+//----------------- Proxys -------------------------------------------
+//https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Proxy
+//https://developer.mozilla.org/es/docs/Web/JavaScript/Reference/Global_Objects/Proxy/Proxy Estos son los metodos del handler
+//------------------ LEE ATENTAMENTE ---------------------------------
+// Los proxys nos permiten interceptar los llamados a un objeto, es decir, si llamamos a una propiedad o a un metodo el Proxy lo va a saber! Es como un worker o un service worker pero interno, con los objetos y no con las peticiones web.
+// LEELO DE ABAJO PARA ARRIBA
+const target = { // Este es el objeto o los valores que se van a interceptar, OJO! Solo se intercepta el objeto 'p', el cual es una copia de este
+    red: 'Rojo',
+    green: 'Verde',
+    blue: 'Azul'
+}
+
+const handler = { // Aqui vamos a definir el objeto con su respectivo getter para poder manipular lo que interceptó
+    get(obj, prop) { // Como primer parametro tenemos al objeto base el cual se interceptó, de segundo parametro fue la llamada que se le hizo al objeto, es decir. Si se pide: p.red, entonces el segundo parametro del getter va a ser 'red', si pedimos: p.reeeed, el segundo parametro va a ser 'reeeed'.
+        if (prop in obj) return obj[prop]; // Verificamos si hay alguna propiedad con ese nombre que pidió, si si. Se lo retornamos
+        // Vamos a crear una sugerencia en caso de que no haya nada con ese nombre.
+        const suggestion = Object.keys(obj).find(key => { // Vamos a sacarle todas las keys al objeto base, esto nos regresa una array y con el metodo find() de array va a servir para encontrar la llave mas parecida. Recordemos que find recorre todas las keys buscando alguna coincidencia que le demos en el callback, y find() nos pasa la key que esta evaluando como parametro para el callback
+            return Levenshtein.get(key, prop) <= 3; // Levenshtein es una libreria para saber cuantos caracteres son diferentes una cadena, es decir: 'red' y 'reed' nos va a retornar 1. le estamos pidiendo que evalue la diferencia entre la llave que esta evaluando el find() con lo que se pidió y se paso como segundo parametro del getter, si la diferencia es menor o igual a 3, entonces retorne true.
+            // Cuando la condicion dentro del callback de find() retorna true, entonces find() coge esa llave que estaba evaluando y la retorna. por eso suggestion contiene la sugerencia de la llave mas parecida
+        });
+        if (suggestion) console.log(`Ups! Al parecer no se encontró ${prop}, pero quizá quisiste decir ${suggestion}?`); // Haz la sugerencia.
+    }
+}
+
+const p = new Proxy(target, handler) // Primero que todo hay que instanciar el objeto Proxy, este va a recibir dos parametros, el objeto que se va a interceptar y el handler, o lo que vamos a hacer cuando intercepte algo, este handler es un objeto con un getter o setter, como se te antoje!
+// En este caso 'p' quedaría con el mismo valor que el objeto 'target'
+// Lee muy atentamente la explicacion a este ejercicio y lee las documentaciones
