@@ -1,13 +1,13 @@
 const cacheName = 'Version 1';
 const filesToCach = [
-    '/',
-    '/index.html',
-    '/assets/index.js',
-    '/assets/mediaPlayer.js',
-    '/assets/Naturaleza.mp4',
-    '/assets/index.css',
-    '/assets/plugins/autoPlay.js',
-    '/assets/plugins/intersection.js'
+    // '/', Los comentamos porque en un entorno de produccion se mueve todo a dist/, y estos tienen unos nombres diferentes, es por eso que los vamos a comentar y vamos a dejar que haga el fetch en la funcion respondCache()
+    // '/index.html',
+    // '/assets/index.js',
+    // '/assets/mediaPlayer.js',
+    // '/assets/Naturaleza.mp4',
+    // '/assets/index.css',
+    // '/assets/plugins/autoPlay.js',
+    // '/assets/plugins/intersection.js'
 ];
 
 const openCache = async () => {
