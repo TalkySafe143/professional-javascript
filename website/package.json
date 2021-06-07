@@ -23,5 +23,8 @@
   },
   "browserslist": [
     "last 1 Chrome version"
-  ]
+  ],
+  "dependencies": {
+    "mediaplayer-talkysafe": "^1.0.0"
+  }
 }

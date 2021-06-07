@@ -1,4 +1,4 @@
-import { MediaPlayer } from "../mediaPlayer";
+import { MediaPlayer } from "../../mediaPlayer";
 
 export default class Intersection {
     private observer : IntersectionObserver;
